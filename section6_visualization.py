@@ -426,5 +426,77 @@ plt.xlim([x_range[0], x_range[-1]]) # adjust x-axis limits according to the firs
 plt.show()
 
 # 8:
-randmat = np.random.randn(5, 9)
-# draw a line from lower-left cornert to upper-right corner
+x = sym.symbols('x')
+y = x**2 - 3*x
+
+xrange = range(-10, 10)
+for i in range(len(xrange)):
+    plt.plot(xrange[i], y.subs(x, xrange[i]), 'o')
+    # not y(xrange[i]), 'o' -> stupid shittt
+
+plt.xlabel('x')
+plt.ylabel('$f(x) = %s' %sym.latex(y))
+plt.show()
+
+
+# 9:
+x = [-5, 5]
+m = 2
+b = 1
+
+y = [m*i + b for i in x]
+# it was just y = m*x + b and that does not work with a list of x values
+
+plt.plot(y, x)
+plt.show()
+
+# 10:
+x = range(-20, 21)
+for i in range(0, len(x)):
+    print(i)
+    plt.plot([0, x[i]], [0, abs(x[i])**(1/2)], color=(i/len(x), i/len(x), i/len(x)))
+    # color, not line_colors?
+plt.axis('off') # not 'of' I guess?
+plt.show()
+
+# 11:
+m = 8
+n = 4
+
+# initialize matrix
+C = np.zeros((m, 4))
+
+# populate the matrix
+for i in range(0, m):
+    for j in range(0, n):
+        C[i, j] = (-1)**(i+j)
+        print(i, j)
+
+# display some numbers
+for i in range(0, m):
+    for j in range(0, n):
+        plt.text(j, i, i+j,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 fontdict=dict(color='m'))
+        # switched x and y (from i, j to j, i)
+'''
+In a matrix like C[i, j],
+
+i = row (goes down = vertical = y)
+
+j = column (goes across = horizontal = x)
+
+In Matplotlib plotting (plt.text(x, y, ...)),
+
+the first number is the x-position
+
+the second number is the y-position
+
+So the meaning of the two coordinates is swapped:
+matrix → (i, j) = (y, x)
+plot → (x, y)
+'''
+plt.imshow(C)
+plt.set_cmap('gray')
+plt.show()
