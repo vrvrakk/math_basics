@@ -178,4 +178,63 @@ eq2 = complex(np.real(w) + np.real(z), np.imag(w)+np.imag(z))
 
 assert eq1 == eq2
 
-# IMAGINARY NUMBERS MULTIPLICATIONS ETC
+# IMAGINARY NUMBERS CONNJUGATE & MULTIPLICATIONS ETC
+# z = a bi
+# w = c di
+
+# z * w = (a bi) * (c di) = ac + adi + cbi + bdi^2 tbh what I already guessed
+# i^2 = -1 !!
+# ac + adi + cbi - bd
+
+# Complex conjugate
+# z*
+# if z = a + bi
+# then z* = a - bi (complex conjugate)
+
+# and if z = a - bi, then the z* = a + bi -> essentially flip the imaginary number
+# z = a bi
+# then apparently... z = a - bi ? whyyyyyyy I think it's wrong
+
+z1 = complex(4, 5)
+z2 = complex(6, -2)
+
+# basically z1 * z2
+w = np.real(z1) * np.real(z2)  + np.real(z1) * np.imag(z2)*1j + np.imag(z1)*1j*np.real(z2) + np.imag(z1)*1j*np.imag(z2)*1j
+print(w)
+print(z1 * z2)
+sym.sympify(z1 * z2)
+np.conj(z1)
+
+# exercise: use sympy to show that z * z* = a^2 + b^2
+# standard approach: z=a+bi
+a, b = sym.symbols('a b', real=True) # secret ingredient is real=True
+
+z = a + b*sym.I
+z_conj = sym.conjugate(z)
+w = sym.expand(z * z_conj)
+print(w)
+
+# COMPLEX NUMBERS: DIVISION
+# example
+# 4 * 2i / 2 = 2 + i
+
+# 4 + 2i / 2 - 3i
+# ok apparently the solution is:
+# (4 + 2i) * (2 + 3i) / (2 - 3i) (2 + 3i) = 2 + 16i / 13 -> denominator is always a real value
+
+# z / w = z * w* / w * w*
+z = complex(4, 2)
+
+z1 = complex(4, 2)
+z2 = complex(2, -3)
+
+print('$\\frac{%s}{%s}$' %(z1, sym.latex(sym.sympify(z2))))
+
+# exercise: simplify equation
+z = complex(4, 2)
+w = complex(3, 5)
+
+eq1 = sym.simplify((z - 1) * (z*w + w) / w*z - w)
+eq2 = sym.simplify((w-1) * (1 - w) / -z*w**2 - w**2 + 2*w*z + 2*w - z - 1)
+
+res = eq1 * eq2
