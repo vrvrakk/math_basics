@@ -409,4 +409,34 @@ yval2find = .5
 tvals = h * np.sqrt(np.log(yval2find) / (-4*np.log(2))) # returns the non-negative square root (the principle square root)
 print(tvals, -tvals)
 
-# gauss exercise:
+# gauss exercise: is gonna be a pain in the ass
+t = np.linspace(-3, 3, 1001) # if we use even number of steps, we do not get step 0 exactly.
+h = np.linspace(0.1, 1, 10)
+gaussian_functions = []
+M = np.zeros((len(h), len(t)))
+for h_val in h:
+    y = np.exp(-4*np.log(2)*t**2 / h_val**2)
+    gaussian_functions.append(y)
+
+for hi in range(0, len(h)):
+    for ti in range(0, len(t)):
+        print(hi, ti)
+        M[hi,ti] = gaussian_functions[hi][ti]
+
+plt.imshow(M, extent=[t[0], t[-1], h[0], h[-1]], cmap='viridis')
+plt.axis('square')
+plt.axis([-3, 3, 0.1, 1])
+plt.show() # this is my answer....problem was mainly 1. small t span
+# matrix x and y flipped?
+
+# ACTUAL ANSWER:
+N = 100
+G = np.zeros((N, len(t)))
+
+for i in range(N):
+    h = (i+1)/N
+    G[i, :] = np.exp(-4*np.log(2)*t**2 / h**2)
+
+
+plt.pcolormesh(G)
+plt.show()
