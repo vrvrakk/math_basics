@@ -423,11 +423,16 @@ for hi in range(0, len(h)):
         print(hi, ti)
         M[hi,ti] = gaussian_functions[hi][ti]
 
-plt.imshow(M, extent=[t[0], t[-1], h[0], h[-1]], cmap='viridis')
+plt.imshow(M, origin='lower', extent=[t[0], t[-1], h[0], h[-1]], cmap='viridis')
+
 plt.axis('square')
 plt.axis([-3, 3, 0.1, 1])
 plt.show() # this is my answer....problem was mainly 1. small t span
 # matrix x and y flipped?
+# correction:
+# In NumPy, M[0, :] is the top row when plotted with imshow.
+# Adding origin='lower' tells matplotlib: “put row 0 at the bottom instead of the top.”
+# But in your mental model, h[0] = 0.1 should be the bottom of the plot (smallest h at the bottom, largest at the top).
 
 # ACTUAL ANSWER:
 N = 100
@@ -439,4 +444,356 @@ for i in range(N):
 
 
 plt.pcolormesh(G)
+plt.show()
+
+
+# Graphing complex roots of unity
+# root of unity: for a complex number to a power
+# z^n = 1
+# z = exp(2pik/n) -> k = 0, 1, ... n-1
+
+n = 5
+
+for k in range(n):
+    root = (sym.exp(2*sym.pi*sym.I*k/n))
+    z = root ** n
+    print('(%s)^{%s} \u2192 %s' %(sym.latex(z), n,sym.latex(root ** n)))
+
+# example 2
+n = 40
+
+for k in range(0, n):
+    z = np.exp(2*(np.pi)*1j*k/n)
+    plt.plot([0, np.real(z)], [0, np.imag(z)])
+
+x = np.linspace(0, 2*np.pi, 100)
+plt.axis('square')
+plt.plot(np.cos(x), np.sin(x), 'k')
+plt.show()
+
+# exercise: plot this seashell looking graph
+x = np.linspace(0, 2*np.pi, 100) # 2 * np.pi is 360 degrees
+division = np.linspace(0, )
+plt.plot(np.cos(x), np.sin(x), 'k')
+plt.show()
+
+
+# try and create a shell:
+# yay I did iiiiiiiiiitttttttttttttttt
+n = 500 # large n imporant
+radius_list = np.linspace(0, 1, n)
+x_list = np.linspace(0, 2*np.pi, n)
+
+for radius, x_value in zip(radius_list, x_list):
+    x = radius * np.cos(x_value)
+    y = radius * np.sin(x_value)
+    plt.plot(x, y, linestyle='-', linewidth=1, color='k') # or add 'ko' to make each point visible!
+    plt.plot([0, x], [0, y], linestyle='-', linewidth=1, color='k')
+
+
+plt.axis('equal')  # equal scaling on x and y
+plt.show()
+# now do the same but with complex nums??
+n = 400
+radius_list = np.linspace(0, 1, n)
+for k in range(0, n):
+    radius = radius_list[k]
+    z = np.exp(2*(np.pi)*1j*k/n)
+    z_final = radius * z
+    plt.plot([0, np.real(z_final)], [0, np.imag(z_final)], color='k') # DO NOT FORGET TO UPDATE Z TO Z_FINAL MORON
+
+plt.axis('square')
+plt.show()
+
+# log scale: space between each value is not equal
+# distances are increasing
+log_space = np.logspace(1, 2, 10) # 10^1 to 10^2
+# what you actually want:
+log_space = np.logspace(np.log10(1), np.log(2), 10)
+
+# log scale exercise:
+# show that a linear scale approaches log scale as the boundaries approach each other
+linear_scale = np.linspace(1, 100, 101)
+log_scale = np.logspace(np.log10(1), np.log10(100), 101)
+x_scale = np.linspace(0, 100, 101)
+plt.plot(x_scale, log_scale, linestyle='-', linewidth=1, color='b', label='log')
+plt.plot(x_scale, linear_scale, linestyle='-', linewidth=1, color='r', alpha=0.5, label='linear')
+plt.legend()
+plt.show()
+
+# logarithmic multiplication and divison
+# log(a*b) = log(a) + log(b)
+# log(a/b) = log(a) - log(b)
+
+a = 3
+b = 4
+
+# y = logb(x) -> x = b^y
+result1 = np.log(a*b)
+result2 = np.log(a) * np.log(b)
+result3 = np.log(a) + np.log(b)
+
+# now division:
+result1 = np.log(a/b)
+result2 = np.log(a) / np.log(b)
+result3 = np.log(a) - np.log(b)
+
+print('\\log(%g\\times\\%g) = \\log(%g) + \\log(%g)' %(a, b, a, b))
+st = '\\log{\\left(\\frac{%g}{%g}\\right)} \\neq \\frac{\\log(%g)}{\\log(%g)}'%(a, b, a, b)
+
+# exercise: log(a^b) = b * lob(a)
+# confirm this is true
+eq1 = np.log(a**b)
+eq2 = b*np.log(a)
+
+assert eq1 == eq2
+
+# arithmetic and geometric sequences
+# FORMULAS:
+# ARITHMETIC
+# an = ao + d(n-1)
+# gn = go r^(n-1)
+
+a = 6
+d = 3
+maxn = 10
+# d - 1 -> np.arange(0, maxn
+ariseq = a + d*np.arange(0, maxn) # d is some kind of scaler, kind of the...speed? the evolution/rate
+
+# now geoseq
+r = 3
+geoseq = a * r**(np.arange(0, maxn)) # clearly muuuuuuuuuuuuuuuuch larger/faster change
+
+plt.plot(ariseq, 'ks', label='arithmetic')
+plt.plot(geoseq, 'rx', label='geometric')
+
+plt.legend()
+plt.show()
+
+# exercise: confirm that the nth term matches for indexing and direct computation
+# implement the two equations (geo and arithmetic), and set max n = 10
+# find the 6th element, get value a and g, I guess
+
+a = 2
+d = 3
+maxn = 10
+n = 6
+ariseq = a + d*5
+geoseq = a * r**5
+
+
+# how to print scientific notation
+x = 12345676543
+'%e' %x # adds e*10^n
+'%.2e' %x # 2 numbers after decimal point!
+
+# exercise: print the nearest order of magnitude of a given number
+x = 2342 # is 3 orders of magnitude, approximately 2*10^3
+
+def magnitude_order(x):
+    orders_mag = np.round(np.log10(x))
+    first_digit = round(x / (10 ** orders_mag))
+    print(f'{x} is {int(orders_mag)} of magnitude, \u2248{first_digit}x10^{int(orders_mag)}')
+
+magnitude_order(x=23456)
+
+# min and maxima values
+# example for maximum
+x = np.linspace(0, 2*np.pi, 20)
+fx = -(np.cos(x) + np.sqrt(x))
+
+fmax = np.max(fx)
+fmax_idx = np.argmax(fx)
+print(fmax, fmax_idx)
+
+plt.plot(x, fx, 'bo-')
+plt.plot(x[fmax_idx], fmax, 'rs')
+
+plt.show()
+
+# example for minimum
+x = np.linspace(-2, 2, 51)
+fx = x**3 + x**4
+
+fmin_idx = np.argmin(fx)
+fmin = fx[fmin_idx]
+
+plt.plot(x, fx, 'bs-')
+plt.plot(x[fmin_idx], fmin, 'rs')
+plt.xlim(-1.2, 0.5)
+plt.ylim(-2, 2)
+
+plt.show()
+
+from scipy.signal import find_peaks
+
+x = np.linspace(0, 12*np.pi, 213)
+fx = -np.cos(x)
+
+peaks = find_peaks(fx)
+
+plt.plot(x, fx)
+plt.plot(x[peaks[0]], fx[peaks[0]], 'rx')
+plt.show()
+
+# even and odd functions
+# fun fact:
+# f(x) is even if f(-x) = f(x)
+# f(x) is off if f(-x) = -f(x)
+
+x = np.linspace(-5, 5, 20)
+f_even = x**2
+f_uneven = (-x)**2
+
+plt.plot(x, f_even)
+plt.plot(x, f_uneven, 'rs')
+plt.show()
+
+f_odd = x**3
+f_ogg_neg = (-x)**3
+fNegOdd = -f_odd
+
+plt.plot(x, f_odd)
+plt.plot(x, f_ogg_neg, 'rs')
+plt.plot(x, fNegOdd, 'g')
+
+plt.show()
+
+# exercise: determine whether sine and cosine are even or odd function!
+x = np.linspace(-2*np.pi, 2*np.pi, 39)
+plt.subplot(2, 1, 1)
+f_cos = np.cos(x)
+f_cos_neg = np.cos(-x)
+plt.plot(x, f_cos, 'gs')
+plt.plot(x, f_cos_neg, 'r')
+plt.show()
+
+plt.subplot(2, 1, 2)
+f_sin = np.sin(x)
+f_sin_neg = np.sin(-x)
+plt.plot(x, f_sin, 'gs')
+plt.plot(x, f_sin_neg, 'r')
+# sin(−x)=−sin(x)
+plt.show()
+# I guess they are...even? ok I forgot to define f_sin negative as NEGATIVE, that was the issue. the sine function is uneven
+
+# ALGEBRA BUG HUNT!
+# 1 list = [1 2 3 4 5] FALSE
+lst = [1, 2, 3, 4]
+
+# add all numbers together
+sum = np.sum(lst)
+
+# plot the cumulative sum of a list of numbers
+l = np.arange(-4, 10)
+cum_sum = np.cumsum(l)
+
+plt.plot(l, 'b', label='list')
+plt.plot(cum_sum, 'g', label='cumulative sum')
+plt.legend()
+plt.show()
+
+# equation:
+x = sym.symbols('x')
+eq = 4 - 2*x + (5*x**3) # we should account for all the x polynomials
+# meaning including 0*x**2
+
+# define the coefficients
+coefs = [4, -2, 5] # this order is WRONG, we should start with the largest polynomial
+coefs = [5, 0, -2, 4]
+
+# solve:
+roots = sym.roots(coefs)
+
+p = sym.Poly(coefs, x)
+
+def quadeq(a, b, c):
+    # quadratic equation
+    out = np.zeros((1, 2))
+    out[0, 0] = (-b - np.sqrt(b**2 - 4*a*c, dtype='complex')) / (2 * a) # added the dtype = complex
+    # because of the nan error
+    out[0, 1] = (-b + np.sqrt(b**2 - 4*a*c, dtype='complex')) / (2 * a)
+    return out
+
+out = quadeq(30, 54, 50)
+
+# create a complex number:
+
+real_part = 4
+imag_part = -6
+
+cn = complex(real_part, imag_part)
+plt.plot(np.real(cn), np.imag(cn), 'ro')
+plt.axis('square')
+plt.axis([-10, 10, -10, 10])
+plt.grid()
+plt.show()
+
+# symbolic complex number
+a, b = sym.symbols('a, b', real=True) # NOT REALLY; REAL!
+z = a + b*sym.I # NOT SYM.1J BITCH
+
+' DEFINE THE PHASE ANGLES'
+x = np.linspace(0, 2*np.pi, 100) # circly thing
+plt.plot(np.cos(x), np.sin(x), 'k')
+
+angle = np.pi/4
+# draw one vector from origin
+plt.plot([0, np.cos(angle)], [0, np.sin(angle)], 'r')
+
+# draw axis lines
+plt.plot([-1, 1],[0, 0], color = [0.5, 0.5, 0.5]) #make lines gray with rgb
+plt.plot([0, 0], [-1,1], color = [0.5, 0.5, 0.5])
+
+# make it look nicer
+plt.axis('equal')
+plt.axis([-1.3, 1.3, -1.3, 1.3])
+plt.xlabel('cos(x)')
+plt.ylabel('sin(x)')
+plt.show()
+
+####
+a = 2
+b = 100
+c = 3 #steps
+lo = np.logspace(np.log10(a), np.log10(b), c)
+li = np.linspace(a, b, c)
+# The first line:
+# li is your linear spacing (x-axis).
+# lo is your logarithmic spacing (y-axis).
+# → This plots how log-spaced values map against linear spacing.
+# The second line:
+# You want to compare it to a straight line.
+# So you plot li against itself (y = x).
+# That’s why it’s li, li.
+
+plt.plot(li,lo, 's-', label='log')
+plt.plot(li, li, 'g-', label='linear')
+plt.legend()
+plt.axis('square')
+plt.show()
+
+# plot max idx
+x = np.linspace(-6, 10,  20)
+# function
+fx = 1/(1+np.exp(x))
+
+fmax_idx = np.argmax(fx)
+fmax = fx[fmax_idx]
+
+# draw the func
+plt.plot(x, fx, 'bo-')
+plt.plot(x[fmax_idx], fmax, 'rs')
+plt.show()
+
+# x range
+x = np.linspace(0, 12*np.pi, 200) # for a wave
+# function
+fx = -(np.cos(x) + x**(1/2))
+# find peaks
+peaks = find_peaks(fx) # dont forget to import
+
+# draw function:
+plt.plot(x, fx)
+plt.plot(x[peaks[0]],fx[peaks[0]], 'o')
 plt.show()
