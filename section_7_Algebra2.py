@@ -107,6 +107,7 @@ def quadeq(a, b, c):
     out[1] = (-b - np.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
     return out
 
+
 out = quadeq(a, b, c)
 
 # exercise
@@ -715,6 +716,7 @@ def quadeq(a, b, c):
     out[0, 1] = (-b + np.sqrt(b**2 - 4*a*c, dtype='complex')) / (2 * a)
     return out
 
+
 out = quadeq(30, 54, 50)
 
 # create a complex number:
@@ -737,7 +739,17 @@ z = a + b*sym.I # NOT SYM.1J BITCH
 x = np.linspace(0, 2*np.pi, 100) # circly thing
 plt.plot(np.cos(x), np.sin(x), 'k')
 
-angle = np.pi/4
+# 3. What if you changed the angle?
+# 0 → vector along +x axis (pointing right).
+# π/2 → vector along +y axis (pointing straight up).
+# π → vector along -x axis (pointing left).
+# 3π/2 → vector along -y axis (down).
+# So π/4 is just a demo choice — it shows a vector at 45°, not special in the code beyond that.
+# ✅ In short:
+# angle = π/4 was chosen because it gives a nice 45° vector in the complex plane,
+# so you can visualize a complex number at that phase. It could be any angle; the code would just rotate the vector.
+
+angle = np.pi/4  #
 # draw one vector from origin
 plt.plot([0, np.cos(angle)], [0, np.sin(angle)], 'r')
 
@@ -755,7 +767,7 @@ plt.show()
 ####
 a = 2
 b = 100
-c = 3 #steps
+c = 3  # steps
 lo = np.logspace(np.log10(a), np.log10(b), c)
 li = np.linspace(a, b, c)
 # The first line:
@@ -797,3 +809,30 @@ peaks = find_peaks(fx) # dont forget to import
 plt.plot(x, fx)
 plt.plot(x[peaks[0]],fx[peaks[0]], 'o')
 plt.show()
+
+# revisit bug hunt
+lst = [1, 2, 3, 4, 5]
+# replaced semicolons with commas
+
+# 2: add all nums together
+lst_sum = np.sum(lst)
+
+# plot the cumulative sum of a list of nums
+# cumsum - lol
+cumsum = np.cumsum(lst)
+
+# now plot
+plt.plot(lst, 'k-', label='x values')
+plt.plot(cumsum, 'rs', label='cumulative sum ')
+plt.legend()
+plt.show()
+
+# the equation:
+# 4 - 2x + 5x^3 -> a polynomial eq
+# define coefficients (so 4, 2 and 5)
+# they need to be defined from highest polynomial to smallest -> including the ones
+# not visible -> x^2 in this case with a coef of 0
+coefs = [5, 0, -2, 4]
+
+# solve:
+roots = np.roots(coefs)  # Return the roots of a polynomial with coefficients given in p.
