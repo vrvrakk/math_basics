@@ -326,3 +326,227 @@ plt.legend()
 
 plt.axis('square')
 plt.show()
+
+# euler's formula
+# e^ik = cos(k) +isin(k)
+# for a point outside the unit circle:
+# me^ik = m (cos(h) + isin(k))
+# m is the magnitude, basically the distance away from the origin
+# e^i*pi + 1 = 0 -> considered the most elegant equation in all of human civilization
+
+k = np.pi/4
+m = 2.3
+
+euler = m* np.exp(1j*k)
+# cosine imaginary sine
+cis = m * (np.cos(k) + 1j * np.sin(k))
+
+print(cis)
+print(euler)
+
+# extract magnitude and anlge from this formula
+magnitude = np.abs(euler)
+ang = np.angle(euler)
+
+plt.polar([0, ang], [0, magnitude], 'r')
+plt.polar(k, m, 'bo')
+
+plt.show()
+
+# euler exercise:
+# write a function with euler
+# two inputs, one cos num, one sine num
+# generate a polar graph
+# vector corresponding with cos part 3 and sine part 4
+# title me^iphi, m = 5, phi = 0.93
+
+# You get two numbers:
+# one is the x-part (cosine / real part)
+# one is the y-part (sine / imaginary part)
+# Together they make a vector (like an arrow) from the origin to that point.
+# Example: (3, 4).
+# Then:
+# Find how long the arrow is (magnitude).
+# Find the angle the arrow makes with the x-axis.
+# Plot that arrow on a polar graph (like a circle with angles).
+
+def eulerFromCosSin():
+    re = float(eval(input('cosine part: ')))
+    im = float(eval(input('sine part: ')))
+    # z = m*e^i⋅angle
+    z = complex(re, im)
+    m = np.abs(z)
+    m = np.sqrt(re**2 + im**2)
+    angle = np.arctan2(im, re)
+    angle = np.angle(z)
+
+    plt.polar([0, angle], [0, m], 'r')
+    plt.polar(angle, m, 'bo')
+    plt.title('me$^{i\\phi}$, m = %g, $\\phi$ = %g' %(m, angle))
+    plt.thetagrids([0, 45, 130, 200, 222.2])
+
+    plt.show()
+
+eulerFromCosSin()
+
+# # We have cos_part = 3 and sine_part = 4
+# # → Think of them as coordinates (x=3, y=4)
+# # → Draw an arrow from (0,0) to (3,4)
+#
+# # Magnitude (length of arrow):
+# # By Pythagoras: sqrt(3^2 + 4^2) = 5
+# # In Python: np.abs(z)
+#
+# # Angle (direction of arrow):
+# # Angle = arctan(4/3) ≈ 0.93 rad (≈ 53 degrees)
+# # In Python: np.angle(z)
+#
+# # Euler’s formula says:
+# #   e^(i·phi) = cos(phi) + i·sin(phi)
+# # → This gives the point on the unit circle at angle phi
+#
+# # To get our arrow, we just scale it by the magnitude:
+# #   z = 5 · e^(i·0.93)
+#
+# # Metaphor:
+# # - Cartesian (3,4): "Go 3 steps east, then 4 steps north"
+# # - Polar/Euler (5·e^(i·0.93)): "Go 5 steps in direction 53° northeast"
+# # Both ways describe the SAME destination (the vector z).
+
+# exercise: random exploding euler
+n = 100
+cos = np.cos(np.random.randn(n))
+sin = np.sin(np.random.randn(n))
+z = [complex(cosine, sine) for cosine, sine in zip(cos, sin)]
+m = [np.abs(z_val) for z_val in z]
+angle = [np.angle(phi) for phi in z]
+
+# random m's and k's
+# 40% pink, 40% purple, 20% green
+# make color list: 40% purple, 40% pink, 20% green
+colors = ['purple'] * int(0.4 * n) + ['red'] * int(0.4 * n) + ['yellow'] * int(0.2 * n)
+import random
+random.shuffle(colors)  # shuffle so they’re spread randomly
+
+# plot with assigned colors
+for i in range(0, n):
+    plt.polar([0, angle[i]], [0, m[i]], color=colors[i])
+
+plt.axis('off')
+plt.show()
+
+# mike version:
+nvects = 200
+ms = np.random.rand(nvects)
+ks = np.random.rand(nvects) * 2 * np.pi # convert to radians
+
+for i in range(0, nvects):
+    r = np.random.rand() # random num
+    if r < .4:
+        clr = [1, .2, .7]
+    elif r > .4 and r < .8:
+        clor = [.7, .2, 1]
+    plt.polar([0, ks[i]], [0, ms[i]], color=clr)
+
+plt.axis('off')
+plt.show()
+
+# or better:
+n = 100
+angles = np.random.uniform(0, 2*np.pi, n)   # uniform around full circle
+m = np.random.rand(n) * 1.0                 # random lengths (0–1 for example)
+
+# color list
+colors = ['purple'] * int(0.4 * n) + ['red'] * int(0.4 * n) + ['yellow'] * int(0.2 * n)
+import random
+random.shuffle(colors)
+
+# plot
+for i in range(n):
+    plt.polar([0, angles[i]], [0, m[i]], color=colors[i])
+
+plt.axis('off')
+plt.show()
+
+# exercise: random rnakes from trigonometry...
+#r1, r2 = random(0,1)
+n = 200
+theta = np.linspace(0, 4*np.pi, n)
+r1, r2 = np.random.uniform(0, 1), np.random.uniform(0, 1)
+x = np.cos(r1*theta)
+y = np.sin(r2*theta)
+
+
+plt.plot(x, y, 'k')
+
+plt.axis('square')
+plt.axis([-1, 1, -1, 1])
+plt.axis('off')
+# plt.title('r1 = %s, r2 = %s' %(r1, r2))
+# or
+plt.title(f'r1 = {np.round(r1, 2)}, r2 = {np.round(r2, 2)}')
+plt.show()
+
+# trigonometry bug hunt!
+# 1: plot a series of random numbers:
+s = np.random.randn(100, 1)
+plt.plot(s, 'o')
+plt.show()
+
+# 2: create an image of a matrix of random integers between and including 3 and 29
+M = np.zeros((10, 10))
+for i in range(M.shape[0]):
+    for j in range(M.shape[1]):
+        replacement = np.random.randint(3, 30, 1)
+        M[i, j] = replacement
+
+# or simply do:
+M = np.random.randint(3, 30, (10, 10)) # cool!
+
+# 3: create 100 random phase angles [0, 2pi] and show unit vectors with those angles
+# 👉 Make 100 random angles between 0 and all the way around circle (0 → 2π).
+# 👉 For each angle, draw arrow of length 1 pointing that way.
+n = 100
+randphases = np.random.rand(n) * 2 * np.pi
+for i in range(0, n):
+    plt.polar([0, randphases[i]], [0, 1], '-', color=np.random.rand(3), markersize=20, alpha=0.8)
+
+plt.show()
+
+# 4: create an outwards spiral using phase angles and amplitudes
+n = 100
+amplitude = np.linspace(0, 1, n)
+radians = np.linspace(0, 4*np.pi, n)
+# it's not plot cos x sine, that's a simple cirlce; also it's not amplitude x theta (cos or sine) -> wave
+# how to implement amplitude with the theta?
+# actual answer:
+# Multiply by amplitude
+# Now imagine the circle, but instead of always having radius = 1, you let radius = amplitude.
+# So the point doesn’t just spin around — it also slowly moves away from the origin.
+cosine_angles = np.cos(radians) * amplitude
+sine_angles = np.sin(radians) * amplitude
+plt.plot(cosine_angles, sine_angles)
+plt.show()
+
+# 5: convert radians to degrees:
+n = 10
+rad = (np.logspace(np.log10(1), np.log10(360), n)) * 2*np.pi / 360
+print(np.rad2deg(rad))
+
+# 6: famous equality in trigonometry:
+ang = np.logspace(np.log10(1), np.log10(2*np.pi), 10) # log cannot be 0
+np.cos(ang)**2 + np.sin(ang)**2
+
+# create euler's number
+phi = np.pi / 4  # angle 45°
+m = .5
+
+euler = m * np.exp(1j*phi)
+
+# extract magnitude and phase:
+m = np.abs(euler)
+angle = np.angle(euler)
+
+# plot
+plt.polar([0, angle], [0, m], 'b', linewidth=3)
+plt.show()
