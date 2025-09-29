@@ -241,3 +241,46 @@ assert product3 != product4
 product5 = sym.diff(fx * gx)
 product6 = (sym.diff(fx) * gx) + (fx * sym.diff(gx))
 assert product5 == product6
+
+
+# circular derivative:
+# cos(x) = -sin(x)
+# -sin(x) = -cos(x)
+# -cos(x) = sin(x)
+# sin(x) = cos(x)
+
+q = sym.symbols('q')
+print(sym.diff(sym.cos(q)))
+print(sym.diff(sym.sin(q)))
+
+f = sym.cos(q)
+dfx = sym.diff(f)
+for i in range(0, 8):
+    print('$\\frac{d}{dx}%s $= ' %(sym.latex(f), sym.latex(dfx)))
+
+# next:
+    for i in range(0, 4):
+        if i == 0:
+            p = symplot(f, show=False, label=sym.latex(f))
+        else:
+            p.extend(symplot(f, show=False, label=sym.latex(f)))
+
+        f = sym.diff(f)
+
+p.legend = True
+p.xlim = [-3, 3]
+p.show()
+
+# exercise:
+a_list = np.linspace(0, 3, 4)
+a = sym.symbols('a')
+fax = sym.cos(x + sym.sin(x)) + a
+dfax = sym.diff(fax)
+for a_val in a_list:
+    res = fax.subs(a, a_val)
+    d_res = sym.diff(fax.subs(a, a_val))
+    p = symplot(res, show=False)
+
+
+
+p.show()
