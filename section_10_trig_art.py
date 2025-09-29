@@ -194,4 +194,5 @@ for r_val, x_list in zip(r, x_arrays):
     plt.scatter([r_val] * len(y), y, s=1)
 
 plt.xlabel('r'); plt.ylabel('x (last 10%)')
+plt.style('dark')
 plt.show()
