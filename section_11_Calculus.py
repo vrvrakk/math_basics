@@ -271,16 +271,64 @@ p.legend = True
 p.xlim = [-3, 3]
 p.show()
 
-# exercise:
-a_list = np.linspace(0, 3, 4)
-a = sym.symbols('a')
+# exercise: plot function results and its derivatives separately
+x, a = sym.symbols('a x')
+
 fax = sym.cos(x + sym.sin(x)) + a
-dfax = sym.diff(fax)
-for a_val in a_list:
-    res = fax.subs(a, a_val)
-    d_res = sym.diff(fax.subs(a, a_val))
-    p = symplot(res, show=False)
+for i in range(0, 5):
+    fax_res = fax.subs(a, i)
+    dfax = sym.diff(fax_res)
+    if i == 0:
+        p = symplot(fax_res, show=False, label='a = %g'%(i))
+        q = symplot(dfax, show=False, label='Derivative of a = %g'%(i))
+    else:
+        p.extend(symplot(fax_res, show=False, label='a = %g'%(i)))
+        q.extend(symplot(dfax, show=False, label='Derivative of a = %g' % (i)))
 
 
 
+p.legend = True
+q.legend = True
+p.xlim = [-10, 10]
+q.xlim = [-10, 10]
+q.show()
 p.show()
+
+# drawing tangent lines (efaptomeni)
+# barely touches the function line
+# tangent line is equal to derivative of the function
+# f'a(x - xa) + fa
+# y = m * x + b # slope intercept form of a line (m)
+# the derivative is the slope of a function
+
+x = sym.symbols('x')
+
+f = x**2
+df = sym.diff(f)
+
+xa = 1  # value at which to compute the tangent line
+
+# get the function and derivative at value xa
+fa = f.subs(x, xa)
+dfa = df.subs(x, xa)
+
+xx = np.linspace(-2, 2, 200)
+f_fun = sym.lambdify(x, f)(xx)
+df_fun = sym.lambdify(x, df)(xx)
+
+# compute the tangent line
+tanline = dfa * (xx-xa) + fa
+
+plt.plot(xx, f_fun, label='f(x)')
+plt.plot(xx, tanline, label='tangent')
+plt.plot(xa, fa, 'ro')
+
+plt.axis('square')
+plt.axis([-2,2, -.5, 2])
+
+ax = plt.gca()
+plt.plot(ax.get_xlim(), [0, 0], 'k--')
+plt.plot([0, 0], ax.get_ylim(), 'k--')
+plt.legend()
+
+plt.show()
