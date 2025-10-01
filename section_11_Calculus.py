@@ -332,3 +332,188 @@ plt.plot([0, 0], ax.get_ylim(), 'k--')
 plt.legend()
 
 plt.show()
+
+# exercise: create a function that returns the tangent line, given
+# a function xa, and domain bounds
+# generate plot using
+# "Write a function that takes any f(x), picks a point a∈(−2,2), finds
+# f′(a) builds the tangent line equation, and plots both the original curve and the tangent line."
+a = np.random.randint(-2, 2)
+x_list = np.linspace(-5, 5, 1000)
+x = sym.symbols('x')
+fx = x**2
+dfx = sym.diff(fx)
+
+fx_list = sym.lambdify(x, fx)(x_list)
+dfx_list = sym.lambdify(x, dfx)(x_list)
+# if a = x
+tangents = []
+for i, a in enumerate(x_list):
+    tangent = fx_list[i] + dfx_list[i] * (x_list - a)
+    tangents.append(tangent)
+
+plt.plot(x_list, fx_list)
+plt.plot(x_list, tangents)
+plt.axis('off')
+plt.show()
+
+'''
+import sympy as sym
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = sym.symbols('x')
+f = x**2
+df = sym.diff(f)
+
+# Pick a random point where we want the tangent
+a = np.random.randint(-2, 2)
+
+# Convert symbolic f and df to real functions
+f_num = sym.lambdify(x, f)
+df_num = sym.lambdify(x, df)
+
+# Evaluate f(a) and f'(a)
+fa = f_num(a)
+dfa = df_num(a)
+
+# Plot range
+x_vals = np.linspace(-5, 5, 200)
+
+# Compute original function and tangent line
+f_res_list = f_num(x_vals)
+tangent_list = fa + dfa * (x_vals - a)
+
+plt.plot(x_vals, f_res_list, label='f(x)')
+plt.plot(x_vals, tangent_list, label='Tangent at x={}'.format(a), linestyle='--')
+plt.scatter(a, fa, color='red')  # Mark the point of tangency
+plt.legend()
+plt.show()
+
+'''
+
+# teacher's way:
+def compute_tangent(f, a, x_list):
+    df = sym.diff(f)
+    fa = f.subs(x, a)
+    dfa = df.subs(x, a)
+
+    # tangent:
+    return dfa * (x_list - a) + fa
+
+
+x = sym.symbols('x')
+f = x ** 2
+x_list = np.linspace(-2, 2, 200)
+f_function = sym.lambdify(x, f)(x_list)  # solve function by x with x= values from x_list
+
+a_val = np.random.randint(-2, 2)
+tanline = compute_tangent(f, a_val, x_list)
+
+for x_val in x_list:
+    # x_val = a_val in this case..I guess?
+    tan = compute_tangent(f, x_val, x_list)
+    plt.plot(x_list, tan)
+
+plt.plot(x_list, f_function)
+plt.axis('square')
+plt.axis([-2, 2, -1, 3])
+plt.axis('off')
+plt.show()
+
+
+# finding critical points in python (in plots)
+# how: got fx -> get dfx -> solve by 0 (like a polynomial
+# get polynomial roots
+from scipy.signal import find_peaks
+
+# empirical method
+x = np.linspace(-5, 5, 1001)
+fx = x**2 * np.exp(-x**2)
+dfx = np.diff(fx) / np.diff(x)
+# or x[1] - x[0]
+
+local_max = find_peaks(fx)
+local_min = find_peaks(-fx)
+
+print(f'The critical points are: {x[local_max[0]]}, {x[local_min[0]]}')
+
+plt.plot(x, fx)
+plt.plot(x[0:-1], dfx) # derivative is one point fewer
+plt.plot(x[local_max[0]], fx[local_max[0]], 'ro')
+plt.plot(x[local_min[0]], fx[local_min[0]], 'go')
+plt.show()
+
+
+# now the analytic method:
+x = sym.symbols('x')
+x_list = np.linspace(-5, 5, 1001)
+fx = x**2 * sym.exp(-x**2)
+dfx = sym.diff(fx)
+fx_list = sym.lambdify(x, fx)(x_list)
+dfx_list = sym.lambdify(x, dfx)(x_list)
+
+local_max = find_peaks(fx_list)
+local_min = find_peaks(-fx_list)
+
+
+print(f'The critical points are: {x_list[local_max[0]]}, {x_list[local_min[0]]}')
+
+plt.plot(x_list, fx_list)
+plt.plot(x_list, dfx_list) # derivative is one point fewer
+plt.plot(x_list[local_max[0]], fx_list[local_max[0]], 'ro')
+plt.plot(x_list[local_min[0]], fx_list[local_min[0]], 'go')
+plt.show()
+
+# exercise: determine which values of a give the function a critical value at x=1
+# or x=2
+x, a = sym.symbols('x a')
+fxa = x**2 * sym.exp(-a*x**2)
+a_list = np.arange(0, 2.25, 0.25)
+x_range = np.linspace(-3, 3, 101)
+
+fig, ax = plt.subplots(1, 2)
+for a_idx in a_list:
+    fx = fxa.subs(a, a_idx)
+    dfx = sym.diff(fx)
+    crit_points = sym.solve(dfx)
+    crit_points = [int(num) for num in crit_points]
+    # plot
+    ax[0].plot(x_range, sym.lambdify(x, fx)(x_range))
+    ax[1].plot(x_range, sym.lambdify(x, dfx)(x_range))
+    for a_idx in a_list:
+        if 1 in crit_points:
+            print(fr'$x^2 e^{{-{a_idx} x^2}}$ has a critical point at $x = 1$. Woohoo!')
+        elif 2 in crit_points:
+            print(fr'$x^2 e^{{-{a_idx} x^2}}$ has a critical point at $x = 2$. Woohoo!')
+        else:
+            print(fr'$x^2 e^{{-{a_idx} x^2}}$ has NO critical points. :(')
+
+ax[0].set_title('Function')
+ax[1].set_title('Derivative')
+plt.show()
+
+# partial derivatives
+# when we have more than one input in a function
+# more than one var
+# i.e. f(x, y)
+# partial der (x) = fx = 2*y**2
+# fy = 4*x*y
+
+from sympy.abc import x, y
+
+f = x**2 + x*y**2
+
+print('\\frac{\\partial f}{\\partial x} = %s'%sym.latex(sym.diff(f, x)))
+print('\\frac{\\partial f}{\\partial y} = %s'%sym.latex(sym.diff(f, y)))
+
+# exercise with partial derivatives:
+# f(x, y) = x**2 + x*y**2
+x, y = sym.symbols('x y')
+fxy = x**2 + x*(y**2)
+partial_x = sym.diff(fxy, x)
+partial_y = sym.diff(fxy, y)
+
+p = sym.plotting.plot3d(fxy, (x, -3, 3), (y, -3, 3), title='$(x, y)$ = %s' %(fxy))
+p = sym.plotting.plot3d(partial_x, (x, -3, 3), (y, -3, 3), title='$(x, y) $= %s' %(fxy))
+p = sym.plotting.plot3d(partial_y, (x, -3, 3), (y, -3, 3), title='$(x, y) $= %s' %(partial_y))
