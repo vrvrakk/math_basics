@@ -517,3 +517,116 @@ partial_y = sym.diff(fxy, y)
 p = sym.plotting.plot3d(fxy, (x, -3, 3), (y, -3, 3), title='$(x, y)$ = %s' %(fxy))
 p = sym.plotting.plot3d(partial_x, (x, -3, 3), (y, -3, 3), title='$(x, y) $= %s' %(fxy))
 p = sym.plotting.plot3d(partial_y, (x, -3, 3), (y, -3, 3), title='$(x, y) $= %s' %(partial_y))
+
+# indefinite and definite integrals
+# no idea what integrations are
+# adding a lot together of really tiny things!
+# what is the area between two lines of a non-linear curve
+# the smallest possible width that a bar can take, that is used to cover the area of interest under the curve
+# sum up very very tiny bars (values) to get the A
+# formula: S between a and b (x and y) of the f(x)*dx
+# f(x) height of the bar at each point of x
+# dx smallest, thinnest width of quantization of x
+# definite integra: between definite points a and b
+
+# indefinite integral of polynomials:
+# S bx^a * dx = bx^(a+1) / a+1 + c
+# integration and derivation are the opposites of each other
+
+x = sym.symbols('x')
+
+
+f = x
+
+sym.integrate(f)
+
+sym.integrate(f, (x, 0, 1))  # indefinite integral
+p = sym.plotting.plot(f, show=False)
+p.xlim = [0, 1]
+p.ylim = [0, 1]
+p.show()
+
+f = x**3 / (x-2)
+intf = sym.integrate(f)
+p = sym.plotting.plot(f, show=False)
+p.extend(sym.plotting.plot(intf,(x, 2.1, 10), show=False, line_color='r'))
+p[0].label = '$f(x) = %s$'%(sym.latex(f))
+p[1].label = '$\\int f(x) dx = %s$'%(sym.latex(intf))
+
+p.legend = True
+p.ylim = [-200, 200]
+p.show()
+
+# exercise:
+
+f = 2*x**3 + sym.sin(x)
+
+deriv = sym.diff(f)
+
+int = sym.integrate(deriv)
+
+# how to calculate the A between two curves
+# S from a to b [f(x) - g(x)] * dx
+
+x = sym.symbols('x')
+symf = x**2
+symg = x
+
+f = sym.lambdify(x, symf)
+g = sym.lambdify(x, symg)
+
+x_vals = np.linspace(-2, 2, 55)
+
+# add patch:
+xpatch = np.linspace(0, 1, 100)
+ypatch = np.vstack((g(xpatch), f(xpatch))).T
+
+fig, ax = plt.subplots()
+from matplotlib.patches import Polygon
+ax.add_patch(Polygon(ypatch, facecolor='k', alpha=.3))
+
+plt.plot(x_vals, f(x_vals))
+plt.plot(x_vals, g(x_vals), 'r')
+
+plt.legend(['$f(x) = %s$'%sym.latex(symf)])
+plt.axis([-.25, 1.25, -.5, 1.5])
+plt.show()
+
+# let's get A between those 2 curves:
+# using intercepts
+# At an intersection point, both curves have the same x and the same y value
+x = sym.symbols('x')
+f = x**2
+g = x
+
+# Find intersection points
+solutions = sym.solve(sym.Eq(f, g), x)  # gives [0, 1]
+
+# Compute definite integral between intersections
+area = sym.integrate(g - f, (x, solutions[0], solutions[1]))
+
+# Area between 2 functions
+# get area between 2 intercepts
+# get definite integral of functions
+x = sym.symbols('x')
+fx = x**2
+gx = x
+
+f = sym.lambdify(x, fx)
+g = sym.lambdify(x, gx)
+
+intercepts = sym.solve(sym.Eq(fx, gx), x)
+
+integral = sym.integrate((f, (x, 0, 1)))
+
+# add patch:
+xpatch = np.linspace(intercepts[0], intercepts[1], 100)
+ypatch = np.vstack((g(xpatch), f(xpatch))).T
+
+fig, ax = plt.subplots()
+from matplotlib.patches import Polygon
+ax.add_patch(Polygon(ypatch, facecolor='k', alpha=.3))
+
+plt.plot(x_vals, f(x_vals))
+plt.plot(x_vals, g(x_vals), 'r')
+plt.show()
