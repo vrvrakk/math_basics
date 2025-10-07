@@ -617,16 +617,183 @@ g = sym.lambdify(x, gx)
 
 intercepts = sym.solve(sym.Eq(fx, gx), x)
 
-integral = sym.integrate((f, (x, 0, 1)))
+integral = sym.integrate(fx, (x, 0, 1))
 
 # add patch:
-xpatch = np.linspace(intercepts[0], intercepts[1], 100)
+xpatch = np.linspace(int(intercepts[0]), int(intercepts[1]), 100)
 ypatch = np.vstack((g(xpatch), f(xpatch))).T
 
 fig, ax = plt.subplots()
 from matplotlib.patches import Polygon
 ax.add_patch(Polygon(ypatch, facecolor='k', alpha=.3))
 
+x_vals = np.linspace(-3, 3, 100)
+
 plt.plot(x_vals, f(x_vals))
 plt.plot(x_vals, g(x_vals), 'r')
+plt.show()
+
+'''
+This is the constant of integration.
+
+Because when you differentiate:
+
+derivative of (x² + 5) is 2x
+
+derivative of (x² − 1000) is also 2x
+
+So when we go backwards (integrate 2x), 
+we don’t know which constant was there originally → so we add + C to represent all possibilities.
+'''
+
+# Bug hunt:
+# 1
+from sympy.abc import x
+fx = (4*x**3 + 2*x**2 - x) / (-4*x**4 + 2*x**2)
+xrange = np.linspace(-2, 2, 200)
+
+fxx = sym.lambdify(x, fx)
+
+plt.plot(xrange, fxx(xrange))
+plt.ylim([-20, 20])
+plt.xlim([0, -1])
+plt.show()
+
+# 2 compute the limit
+x = sym.symbols('x')
+fx = 1 / (x + 3)
+
+lim_pnt = -3
+
+lim = sym.limit(x, fx, lim_pnt, dir='+')
+
+# 3 piece-wise function
+from sympy.abc import x
+piece1 = x**2
+piece2 = 4 * sym.exp(-x**2)
+
+fx = sym.Piecewise((piece1,x<0), (piece2, x>=0))
+
+xx = np.linspace(-2, 2, 1000)
+fxx = sym.lambdify(x, fx)
+
+plt.plot(xx, fxx(xx), 'k')
+plt.show()
+
+# 3 show the first and second diff of sin(x)
+x = np.linspace(-2*np.pi, 2*np.pi, 200)
+dt = np.diff(x[0:2])
+
+f = np.sin(x)
+dfx = np.diff(f) / dt
+dfxx = np.diff(f, 2) / dt**2
+
+plt.plot(x, f, color='b', label='f(x)')
+plt.plot(x[0:-1], dfx, color='k', label='dx')
+plt.plot(x[0:-2], dfxx, color='r', label='d(dfx)')
+
+plt.legend()
+plt.show()
+
+# 4 compute critical points using sympy
+x = sym.symbols('x')
+fx = x**2 * sym.exp(-x**2)
+dfx = sym.diff(fx)
+
+# derivative in simpy, solve
+lambda_fx = sym.lambdify(x, dfx)
+x_list = np.linspace(-5, 5, 100)
+y = lambda_fx(x_list)
+
+# solve dfx = 0
+crit_points = sym.solve(sym.Eq(dfx, 0), x)
+# plot the function derivative and its crit points
+plt.plot(x_list, y, 'k--')
+for i in crit_points:
+    plt.plot(i, 0, 'ro')
+
+
+plt.show()
+
+# compute the area between 2 curves
+from matplotlib.patches import Polygon
+x = sym.symbols('x')
+f1 = sym.cos(x)
+f2 = x
+
+x_list = np.linspace(0, np.pi/3, 100)
+fx1 = sym.lambdify(x, f1)(x_list)
+fx2 = sym.lambdify(x, f2)(x_list)
+
+intersect = float(sym.nsolve(f1 - f2, 0.5)) # numerical solve!
+
+# add patch:
+xpatch = np.linspace(0, intersect, 100)
+ypatch = np.vstack((sym.lambdify(x, f1)(xpatch), sym.lambdify(x, f2)(xpatch))).T
+
+fig, ax = plt.subplots()
+from matplotlib.patches import Polygon
+ax.add_patch(Polygon(ypatch, facecolor='k', alpha=.3))
+
+plt.plot(x_list, fx1, label='cos(x)')
+plt.plot(x_list, fx2, label='x')
+plt.axvline(intersect, color='r', linestyle='--', label='Intersection')
+plt.legend()
+plt.show()
+
+# teacher:
+import sympy as sym
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
+
+# -------------------------------
+# 1) Define symbolic functions
+# -------------------------------
+x = sym.symbols('x')
+f1sym = sym.cos(x)   # symbolic cos(x)
+f2sym = x            # symbolic x
+
+# -------------------------------
+# 2) Create x values (numeric)
+# -------------------------------
+x_list = np.linspace(0, np.pi/3, 100)  # x values from 0 to pi/3
+
+# -------------------------------
+# 3) Compute numeric y-values
+# -------------------------------
+f1 = np.cos(x_list)   # cos(x) evaluated at all x_list points
+f2 = x_list           # x itself as numeric list
+
+# -------------------------------
+# 4) Find approximate intersection
+#    → where |cos(x) - x| is smallest
+# -------------------------------
+f_intersect = np.argmin(abs(f1 - f2))  # gives index, not actual x
+
+# -------------------------------
+# 5) Compute area between curves (symbolic)
+# -------------------------------
+A = sym.integrate(f1sym - f2sym, (x, x_list[0], x_list[f_intersect]))
+# NOTE: this gives *symbolic* exact area
+
+# -------------------------------
+# 6) Build patch area (shaded region)
+#    → First go along cos(x), then back along x
+# -------------------------------
+traceX = np.concatenate((x_list[:f_intersect], x_list[f_intersect:0:-1]))
+traceY = np.concatenate((f1[:f_intersect], f2[f_intersect:0:-1]))
+
+points = np.vstack((traceX, traceY)).T  # stack as (x,y) pairs
+p = Polygon(points, facecolor='k', alpha=0.3)
+
+# -------------------------------
+# 7) Plot everything
+# -------------------------------
+fig, ax = plt.subplots()
+ax.add_patch(p)                 # add shaded area
+plt.plot(x_list, f1, label='cos(x)')
+plt.plot(x_list, f2, label='x')
+plt.title(f"Area ≈ {float(A):.4f}")
+plt.legend()
 plt.show()
